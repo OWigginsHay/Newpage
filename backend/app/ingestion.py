@@ -14,7 +14,8 @@ from .chunking import chunk_text
 from .config import settings
 
 TEXT_EXTENSIONS = {".txt", ".md", ".markdown", ".rst", ".csv", ".json", ".log"}
-SUPPORTED_EXTENSIONS = TEXT_EXTENSIONS | {".pdf"}
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff", ".gif"}
+SUPPORTED_EXTENSIONS = TEXT_EXTENSIONS | IMAGE_EXTENSIONS | {".pdf"}
 
 # A page with fewer than this many characters but with images is treated as scanned.
 _SCANNED_TEXT_THRESHOLD = 20
@@ -29,6 +30,10 @@ def get_pages(path: str) -> list[tuple[int | None, str]]:
     ext = os.path.splitext(path)[1].lower()
     if ext == ".pdf":
         return _pdf_pages(path)
+    if ext in IMAGE_EXTENSIONS:
+        from .ocr import ocr_image  # the image's content is text we OCR
+
+        return [(None, ocr_image(path))]
     if ext in TEXT_EXTENSIONS:
         with open(path, "r", encoding="utf-8", errors="replace") as handle:
             return [(None, handle.read())]
