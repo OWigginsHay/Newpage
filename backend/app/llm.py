@@ -43,6 +43,14 @@ def current_reasoning() -> str:
     return _runtime["reasoning"] or settings.reasoning
 
 
+# Model families that default reasoning ON (they need reasoning_effort managed).
+_REASONING_PREFIXES = ("gpt-5", "o1", "o3", "o4", "o5")
+
+
+def _is_reasoning_model(model: str) -> bool:
+    return (model or "").lower().startswith(_REASONING_PREFIXES)
+
+
 def is_configured() -> bool:
     return bool(_effective_key())
 
@@ -70,12 +78,24 @@ def chat_completion(messages: list[dict], tools: list[dict] | None = None) -> di
         "tools": tools or None,
         "tool_choice": "auto" if tools else None,
     }
-    reasoning = current_reasoning()
-    if reasoning and reasoning != "none":
-        # only sent for reasoning-capable models (the UI gates this)
-        kwargs["reasoning_effort"] = reasoning
+    # Reasoning models (gpt-5.x, o-series) default reasoning ON, and the
+    # chat-completions endpoint refuses reasoning_effort together with function
+    # tools. Our agent always uses tools, so we must *explicitly* set
+    # reasoning_effort='none' for those models (omitting it leaves the default
+    # on). Non-reasoning models (e.g. gpt-4o-mini) don't accept the param, so we
+    # omit it there. True reasoning + tools would need the Responses API.
+    reasoning = current_reasoning() or "none"
+    if _is_reasoning_model(current_model()):
+        kwargs["reasoning_effort"] = "none" if tools else reasoning
 
-    response = _get_client().chat.completions.create(**kwargs)
+    try:
+        response = _get_client().chat.completions.create(**kwargs)
+    except Exception as exc:  # safety net for any model we didn't classify
+        if "reasoning_effort" in str(exc) and kwargs.get("reasoning_effort") != "none":
+            kwargs["reasoning_effort"] = "none"
+            response = _get_client().chat.completions.create(**kwargs)
+        else:
+            raise
     return normalise(response)
 
 

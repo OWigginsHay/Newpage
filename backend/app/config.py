@@ -55,3 +55,28 @@ class Settings:
 
 
 settings = Settings.from_env()
+
+
+_ENV_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+
+
+def persist_env(**updates: str | None) -> None:
+    """Write selected settings to backend/.env (gitignored) so they survive a
+    restart. Only non-None keys are updated; existing entries are preserved.
+    Local convenience — the key lives in plaintext on this machine only.
+    """
+    existing: dict[str, str] = {}
+    if os.path.exists(_ENV_PATH):
+        with open(_ENV_PATH, "r", encoding="utf-8") as handle:
+            for line in handle:
+                stripped = line.strip()
+                if not stripped or stripped.startswith("#") or "=" not in stripped:
+                    continue
+                key, _, value = stripped.partition("=")
+                existing[key.strip()] = value
+    for key, value in updates.items():
+        if value is not None:
+            existing[key] = value
+    with open(_ENV_PATH, "w", encoding="utf-8") as handle:
+        for key, value in existing.items():
+            handle.write(f"{key}={value}\n")

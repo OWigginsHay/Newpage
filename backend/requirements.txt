@@ -13,7 +13,9 @@ chromadb>=0.5
 
 # --- document ingestion ---
 pymupdf>=1.24
-rapidocr-onnxruntime>=1.3   # optional OCR for scanned pages (CPU, pip-only)
+# OCR for scanned pages / image files (first available is used; see app/ocr.py):
+easyocr>=1.7                 # GPU-accelerated when Torch/CUDA present (best quality)
+# rapidocr-onnxruntime>=1.3  # CPU-only alternative (pip-only, no model download)
 
 # --- dev / test ---
 pytest>=8.0

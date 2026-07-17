@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from . import agents, filepicker, ingestion, llm, tools, vector_store  # noqa: F401  (tools import registers them)
-from .config import settings
+from .config import persist_env, settings
 
 app = FastAPI(title="Newpage — Chat With Your Docs", version="0.1.0")
 
@@ -55,6 +55,12 @@ def set_config(request: ConfigRequest) -> dict:
     """Set the OpenAI key/model/reasoning at runtime (from the UI). Held in memory only."""
     llm.set_credentials(
         api_key=request.openai_api_key, model=request.model, reasoning=request.reasoning
+    )
+    # Persist locally (gitignored .env) so it survives backend restarts.
+    persist_env(
+        OPENAI_API_KEY=request.openai_api_key or None,
+        OPENAI_MODEL=request.model,
+        OPENAI_REASONING=request.reasoning,
     )
     return {
         "configured": llm.is_configured(),

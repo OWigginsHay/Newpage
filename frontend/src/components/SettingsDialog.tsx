@@ -56,8 +56,9 @@ export function SettingsDialog({
       >
         <h2 className="modal__title">Settings</h2>
         <p className="modal__note">
-          Your key is sent to your local backend and kept in this browser only —
-          never committed or sent anywhere else.
+          Your key stays on your machine — saved to a gitignored <code>.env</code> on
+          the local backend (so it survives restarts) and cached in this browser.
+          Never committed or sent anywhere else.
         </p>
 
         <Input
