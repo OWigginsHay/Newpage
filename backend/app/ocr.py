@@ -15,7 +15,9 @@ def _engine() -> tuple[str | None, Any]:
     try:
         import easyocr
 
-        return "easyocr", easyocr.Reader(["en"])  # GPU auto-detected when available
+        # verbose=False avoids a Windows console crash: the download progress bar
+        # prints a U+2588 block char that cp1252 can't encode.
+        return "easyocr", easyocr.Reader(["en"], verbose=False)  # GPU auto-detected
     except Exception:
         pass
     try:
