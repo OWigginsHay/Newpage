@@ -1,0 +1,91 @@
+:root{
+  /* ---- Brand core (from the Newpage mark) ---- */
+  --brand-teal:#08BDB8;        /* primary */
+  --brand-teal-dark:#008C85;
+  --brand-yellow:#FFCF36;
+  --brand-orange:#FF7F1F;
+
+  /* ---- Teal ramp (primary) ---- */
+  --teal-50:#E6F9F8;
+  --teal-100:#C3F0EE;
+  --teal-200:#8FE4E0;
+  --teal-300:#4FD4CE;
+  --teal-400:#08BDB8;
+  --teal-500:#00A8A2;
+  --teal-600:#008C85;
+  --teal-700:#006E68;
+  --teal-800:#004F4B;
+
+  /* ---- Yellow ramp (accent) ---- */
+  --yellow-100:#FFF4CC;
+  --yellow-300:#FFE180;
+  --yellow-500:#FFCF36;
+  --yellow-700:#E0AE00;
+
+  /* ---- Orange ramp (accent) ---- */
+  --orange-100:#FFE7D1;
+  --orange-300:#FFB980;
+  --orange-500:#FF7F1F;
+  --orange-700:#D65E00;
+
+  /* ---- Neutral ramp ---- */
+  --neutral-0:#FFFFFF;
+  --neutral-50:#F7F9F9;
+  --neutral-100:#EEF1F2;
+  --neutral-200:#DDE3E4;
+  --neutral-300:#C2CBCD;
+  --neutral-400:#94A1A4;
+  --neutral-500:#68767A;
+  --neutral-600:#495457;
+  --neutral-700:#2E3739;
+  --neutral-800:#1A2123;
+  --neutral-900:#0C1213;
+
+  /* ---- Functional / semantic hues ---- */
+  --green-500:#1DA871;
+  --green-100:#DCF4EA;
+  --red-500:#E23B3B;
+  --red-100:#FBE0E0;
+  --amber-500:#F5A623;
+  --amber-100:#FDEECF;
+  --blue-500:#2F7CE0;
+  --blue-100:#DCEAFB;
+
+  /* ================= Semantic aliases ================= */
+  --color-primary:var(--brand-teal);
+  --color-primary-hover:var(--teal-500);
+  --color-primary-active:var(--teal-600);
+  --color-primary-subtle:var(--teal-50);
+  --color-on-primary:var(--neutral-0);
+
+  --color-accent-yellow:var(--brand-yellow);
+  --color-accent-orange:var(--brand-orange);
+
+  --text-primary:var(--neutral-900);
+  --text-secondary:var(--neutral-600);
+  --text-muted:var(--neutral-500);
+  --text-inverse:var(--neutral-0);
+  --text-link:var(--teal-600);
+  --text-link-hover:var(--teal-700);
+
+  --surface-page:var(--neutral-0);
+  --surface-subtle:var(--neutral-50);
+  --surface-card:var(--neutral-0);
+  --surface-inverse:var(--neutral-900);
+  --surface-brand:var(--brand-teal);
+
+  --border-subtle:var(--neutral-200);
+  --border-default:var(--neutral-300);
+  --border-strong:var(--neutral-400);
+
+  --color-success:var(--green-500);
+  --color-success-subtle:var(--green-100);
+  --color-danger:var(--red-500);
+  --color-danger-subtle:var(--red-100);
+  --color-warning:var(--amber-500);
+  --color-warning-subtle:var(--amber-100);
+  --color-info:var(--blue-500);
+  --color-info-subtle:var(--blue-100);
+
+  --focus-ring:color-mix(in srgb, var(--brand-teal) 45%, transparent);
+}

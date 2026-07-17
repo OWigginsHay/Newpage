@@ -1,0 +1,10 @@
+<!-- @dsCard group="Colors" viewport="700x120" name="Teal ramp (primary)" subtitle="Tints and shades of the primary teal" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;font-family:var(--font-sans);background:#fff;padding:20px}.row{display:flex;gap:6px}.sw{flex:1;text-align:center}.chip{height:56px;border-radius:8px;border:1px solid rgba(0,0,0,.06)}.l{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:6px}</style>
+</head><body>
+<div class="row" id="r"></div>
+<script>
+const ramp=[['50','#E6F9F8'],['100','#C3F0EE'],['200','#8FE4E0'],['300','#4FD4CE'],['400','#08BDB8'],['500','#00A8A2'],['600','#008C85'],['700','#006E68'],['800','#004F4B']];
+document.getElementById('r').innerHTML=ramp.map(([n,h])=>`<div class="sw"><div class="chip" style="background:${h}"></div><div class="l">${n}</div></div>`).join('');
+</script>
+</body></html>

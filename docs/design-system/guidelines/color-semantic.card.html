@@ -1,0 +1,10 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Accent & semantic" subtitle="Yellow / orange accents and functional states" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;font-family:var(--font-sans);background:#fff;padding:20px}.row{display:flex;gap:10px}.sw{flex:1;text-align:center}.chip{height:52px;border-radius:8px;border:1px solid rgba(0,0,0,.06)}.n{font-size:11px;font-weight:600;margin-top:6px}.h{font-size:10px;color:var(--text-muted);font-family:var(--font-mono)}</style>
+</head><body>
+<div class="row" id="r"></div>
+<script>
+const c=[['Yellow','#FFCF36'],['Orange','#FF7F1F'],['Success','#1DA871'],['Warning','#F5A623'],['Danger','#E23B3B'],['Info','#2F7CE0']];
+document.getElementById('r').innerHTML=c.map(([n,h])=>`<div class="sw"><div class="chip" style="background:${h}"></div><div class="n">${n}</div><div class="h">${h}</div></div>`).join('');
+</script>
+</body></html>
