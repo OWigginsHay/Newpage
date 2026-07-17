@@ -172,6 +172,29 @@
 .tool-chip--error .tool-chip__label {
   color: var(--color-danger);
 }
+
+/* guardrail chip variants */
+.guardrail-chip--ok .tool-chip__icon {
+  color: var(--teal-600);
+}
+.guardrail-chip--warn {
+  background: var(--amber-100);
+  border-color: var(--amber-100);
+}
+.guardrail-chip--warn .tool-chip__icon,
+.guardrail-chip--warn .tool-chip__label,
+.guardrail-chip--warn .tool-chip__detail {
+  color: #a9720b;
+}
+.guardrail-chip--blocked {
+  background: var(--color-danger-subtle);
+  border-color: var(--red-100);
+}
+.guardrail-chip--blocked .tool-chip__icon,
+.guardrail-chip--blocked .tool-chip__label,
+.guardrail-chip--blocked .tool-chip__detail {
+  color: var(--color-danger);
+}
 .msg__bubble {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);

@@ -47,6 +47,14 @@ as context.
 The model should not be equipped with tools that write or overwrite system data.
 For a file discussion and conversational tool, the agent's tools are read-only.
 
+I also think it is important to understand when the system is being used for
+unintended purposes, and to have telemetry on how it is being used. A simple
+off-the-shelf solution is the OpenAI moderation API — but we can also layer in our
+own jailbreak-detection attempts using cosine-similarity screening, and topic-shift
+detection between consecutive messages. All three run before the model, and the
+outcome is shown on every message (a small shield chip), so misuse is visible
+rather than silent.
+
 ---
 
 ## Engineering approach
@@ -82,6 +90,15 @@ AWS or Azure we could use **Bedrock** or **Azure AI Foundry**.
 **FastAPI** I use as a standard default for Python. I picked **React** for the
 frontend out of familiarity — **Next.js** would also have been a good choice.
 
+For **guardrails** I use the OpenAI moderation endpoint as the primary,
+off-the-shelf safety net, then layer two lightweight DIY checks on top: a
+jailbreak / prompt-injection screen (cosine similarity of the message embedding
+against a small corpus of known jailbreak patterns — reusing the
+sentence-transformer already loaded for RAG), and a topic-shift signal (cosine
+between consecutive user messages). Blocked messages are refused before any tokens
+are spent. It's a cheap way to get some visibility into misuse without adding
+heavy dependencies.
+
 _Alternatives I reviewed for the vector DB and OCR are written up in_
 [docs/research/](docs/research/).
 
@@ -102,6 +119,8 @@ _Alternatives I reviewed for the vector DB and OCR are written up in_
 - **Tool-use transparency pips** — each answer shows which tools ran (semantic
   search, keyword search, read file) and their result counts.
 - **Read-only agent** — the agent has no write/delete/overwrite tools by design.
+- **Guardrails** — OpenAI moderation plus a DIY jailbreak-similarity screen and a
+  topic-drift signal, run before the model; the outcome shows as a shield chip.
 - **Brand alignment** — built on the Newpage design system (tokens, components,
   logo), light/dark aware.
 - **Key entered in the UI** — no key on disk required to start; it's held locally.

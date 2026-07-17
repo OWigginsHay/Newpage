@@ -5,6 +5,7 @@ import {
   type ChunksResponse,
   type Citation,
   type ConfigState,
+  type Guardrail,
   type Health,
   type ToolStep,
 } from "./api";
@@ -21,6 +22,7 @@ type Message = {
   content: string;
   citations?: Citation[];
   steps?: ToolStep[];
+  guardrail?: Guardrail;
 };
 
 const KEY_STORAGE = "newpage.openai_key";
@@ -165,6 +167,7 @@ function App() {
           content: response.answer,
           citations: response.citations,
           steps: response.steps,
+          guardrail: response.guardrail,
         },
       ]);
     } catch (error) {
@@ -272,6 +275,7 @@ function App() {
               content={message.content}
               citations={message.citations}
               steps={message.steps}
+              guardrail={message.guardrail}
             />
           ))}
           {sending && <ChatMessage role="assistant" content="" typing />}

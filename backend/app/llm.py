@@ -99,6 +99,19 @@ def chat_completion(messages: list[dict], tools: list[dict] | None = None) -> di
     return normalise(response)
 
 
+def moderate(text: str) -> dict:
+    """OpenAI moderation (free endpoint). Returns {flagged, categories}."""
+    response = _get_client().moderations.create(
+        model="omni-moderation-latest", input=text
+    )
+    result = response.results[0]
+    try:
+        categories = [name for name, on in result.categories.model_dump().items() if on]
+    except Exception:
+        categories = []
+    return {"flagged": bool(result.flagged), "categories": categories}
+
+
 def normalise(response: Any) -> dict:
     """Collapse a vendor response into the one shape ``agents`` understands."""
     message = response.choices[0].message

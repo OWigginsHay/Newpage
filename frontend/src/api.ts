@@ -71,11 +71,27 @@ export type ToolStep = {
   ok: boolean;
 };
 
+export type GuardrailFlag = {
+  type: string;
+  flagged?: boolean;
+  score?: number;
+  similarity?: number;
+  categories?: string[];
+  error?: string;
+};
+
+export type Guardrail = {
+  allowed: boolean;
+  reason: string | null;
+  flags: GuardrailFlag[];
+};
+
 export type ChatResponse = {
   conversation_id: string;
   answer: string;
   citations: Citation[];
   steps: ToolStep[];
+  guardrail?: Guardrail;
 };
 
 export type IngestResponse = {

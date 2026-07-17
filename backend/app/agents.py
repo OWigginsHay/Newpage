@@ -9,7 +9,7 @@ import json
 import uuid
 from typing import Any
 
-from . import llm
+from . import guardrails, llm
 from .config import settings
 from .registry import dispatch, get_functions
 from .tool_schema import to_openai
@@ -41,7 +41,21 @@ def get_tool_schema() -> list[dict]:
 def send_chat(user_message: str, conv_id: str | None = None) -> dict:
     """Run one user turn to completion, letting the model call tools as needed."""
     conv_id, history = _get_or_create(conv_id)
+    previous_user = _last_user_message(history)
     history.append({"role": "user", "content": user_message})
+
+    # Input guardrails: block before spending any tokens/tools if flagged.
+    guard = guardrails.check(user_message, previous_user)
+    if not guard["allowed"]:
+        refusal = f"I can't help with that request. {guard['reason'] or ''}".strip()
+        history.append({"role": "assistant", "content": refusal})
+        return {
+            "conversation_id": conv_id,
+            "answer": refusal,
+            "citations": [],
+            "steps": [],
+            "guardrail": guard,
+        }
 
     tools = get_tool_schema()
     citations: list[dict] = []
@@ -84,6 +98,7 @@ def send_chat(user_message: str, conv_id: str | None = None) -> dict:
             "answer": reply["content"],
             "citations": _dedupe(citations),
             "steps": steps,
+            "guardrail": guard,
         }
 
     return {
@@ -91,10 +106,18 @@ def send_chat(user_message: str, conv_id: str | None = None) -> dict:
         "answer": "I wasn't able to finish within the tool-call limit.",
         "citations": _dedupe(citations),
         "steps": steps,
+        "guardrail": guard,
     }
 
 
 # --- internals ------------------------------------------------------------
+
+
+def _last_user_message(history: list[dict]) -> str | None:
+    for message in reversed(history):
+        if message.get("role") == "user" and isinstance(message.get("content"), str):
+            return message["content"]
+    return None
 
 
 def _get_or_create(conv_id: str | None) -> tuple[str, list[dict]]:
