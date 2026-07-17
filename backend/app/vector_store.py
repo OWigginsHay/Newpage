@@ -111,6 +111,26 @@ def list_all() -> dict:
     }
 
 
+def delete_by_source(source: str) -> int:
+    """Remove all chunks belonging to one source file. Returns the count removed."""
+    collection = _collection()
+    before = collection.count()
+    collection.delete(where={"source": source})
+    return before - collection.count()
+
+
+def clear() -> None:
+    """Drop the whole collection (wipe the index)."""
+    import chromadb
+
+    client = chromadb.PersistentClient(path=settings.chroma_path)
+    try:
+        client.delete_collection(settings.collection_name)
+    except Exception:
+        pass
+    _collection.cache_clear()  # next access re-creates an empty collection
+
+
 def get_text(source: str, start: int) -> str:
     """Fallback lookup of a chunk's stored text by (source, start offset)."""
     try:

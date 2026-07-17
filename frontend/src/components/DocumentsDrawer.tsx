@@ -17,11 +17,12 @@ function baseName(path: string): string {
 }
 
 /** Slide-over showing the indexed corpus as a folder → file → chunk tree,
- *  with a live preview of the selected chunk in its document context. */
+ *  with a live chunk preview, per-file delete, and a clear-all. */
 export function DocumentsDrawer({ open, data, loading, onClose, onRefresh }: DocumentsDrawerProps) {
   const [selected, setSelected] = useState<{ source: string; chunk: ChunkMeta } | null>(null);
   const [ctx, setCtx] = useState<ChunkContext | null>(null);
   const [ctxLoading, setCtxLoading] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   async function selectChunk(source: string, chunk: ChunkMeta) {
     setSelected({ source, chunk });
@@ -33,6 +34,30 @@ export function DocumentsDrawer({ open, data, loading, onClose, onRefresh }: Doc
       setCtx(null);
     } finally {
       setCtxLoading(false);
+    }
+  }
+
+  async function deleteSource(source: string) {
+    if (!window.confirm(`Remove "${baseName(source)}" and all its chunks from the index?`)) return;
+    setBusy(true);
+    try {
+      await api.deleteChunks(source);
+      if (selected?.source === source) setSelected(null);
+      onRefresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function clearAll() {
+    if (!window.confirm("Clear the entire index? This removes every document's chunks.")) return;
+    setBusy(true);
+    try {
+      await api.deleteChunks();
+      setSelected(null);
+      onRefresh();
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -52,6 +77,14 @@ export function DocumentsDrawer({ open, data, loading, onClose, onRefresh }: Doc
             <Button size="sm" variant="ghost" onClick={onRefresh}>
               Refresh
             </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={busy || !data || data.total_chunks === 0}
+              onClick={clearAll}
+            >
+              Clear all
+            </Button>
             <button className="drawer__close" onClick={onClose} aria-label="Close">
               ×
             </button>
@@ -68,6 +101,7 @@ export function DocumentsDrawer({ open, data, loading, onClose, onRefresh }: Doc
               <DocumentTree
                 files={data.files}
                 onSelect={selectChunk}
+                onDelete={deleteSource}
                 selectedId={selected?.chunk.id ?? null}
               />
             )}

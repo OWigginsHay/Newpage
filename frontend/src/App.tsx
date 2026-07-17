@@ -37,6 +37,7 @@ function App() {
 
   const [ingestPath, setIngestPath] = useState("");
   const [ingesting, setIngesting] = useState(false);
+  const [recursive, setRecursive] = useState(true);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
@@ -138,7 +139,7 @@ function App() {
     setIngesting(true);
     setBanner(null);
     try {
-      const result = await api.ingest(path);
+      const result = await api.ingest(path, recursive);
       setBanner(`Indexed ${result.total_chunks} chunks from ${result.ingested.length} file(s).`);
       await Promise.all([refreshStatus(), loadChunks()]);
     } catch (error) {
@@ -222,6 +223,14 @@ function App() {
         <Button variant="ghost" onClick={handleBrowse} disabled={offline}>
           Browse…
         </Button>
+        <label className="ingest-opt" title="Also index files inside subfolders">
+          <input
+            type="checkbox"
+            checked={recursive}
+            onChange={(e) => setRecursive(e.target.checked)}
+          />
+          Subfolders
+        </label>
         <Button
           variant="secondary"
           onClick={handleIngest}
@@ -297,7 +306,9 @@ function App() {
         data={chunks}
         loading={chunksLoading}
         onClose={() => setDocsOpen(false)}
-        onRefresh={loadChunks}
+        onRefresh={() => {
+          void Promise.all([loadChunks(), refreshStatus()]);
+        }}
       />
     </div>
   );

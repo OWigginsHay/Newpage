@@ -26,6 +26,7 @@ class ChatRequest(BaseModel):
 
 class IngestRequest(BaseModel):
     path: str
+    recursive: bool = True
 
 
 class ConfigRequest(BaseModel):
@@ -106,7 +107,7 @@ def list_tools() -> dict:
 
 @app.post("/ingest")
 def ingest(request: IngestRequest) -> dict:
-    return ingestion.ingest_path(request.path)
+    return ingestion.ingest_path(request.path, recursive=request.recursive)
 
 
 @app.get("/chunks")
@@ -116,6 +117,16 @@ def list_chunks() -> dict:
         return vector_store.list_all()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Could not list chunks: {exc}") from exc
+
+
+@app.delete("/chunks")
+def delete_chunks(source: str | None = None) -> dict:
+    """Remove one file's chunks (?source=...), or clear the whole index (no source)."""
+    if source:
+        removed = vector_store.delete_by_source(source)
+        return {"deleted": removed, "source": source}
+    vector_store.clear()
+    return {"cleared": True}
 
 
 @app.get("/chunk_context")

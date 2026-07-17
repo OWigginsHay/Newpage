@@ -115,11 +115,17 @@ export const api = {
   browse: (mode: "directory" | "file" = "directory") =>
     request<{ path: string }>(`/browse?mode=${mode}`),
 
-  ingest: (path: string) =>
+  ingest: (path: string, recursive = true) =>
     request<IngestResponse>("/ingest", {
       method: "POST",
-      body: JSON.stringify({ path }),
+      body: JSON.stringify({ path, recursive }),
     }),
+
+  deleteChunks: (source?: string) =>
+    request<{ deleted?: number; cleared?: boolean }>(
+      `/chunks${source ? `?source=${encodeURIComponent(source)}` : ""}`,
+      { method: "DELETE" },
+    ),
 
   chat: (message: string, conversation_id?: string | null) =>
     request<ChatResponse>("/chat", {

@@ -42,36 +42,49 @@ const FolderIcon = () => (
 
 const FileIcon = () => (
   <svg className="tree-icon" viewBox="0 0 16 16" aria-hidden="true">
-    <path
-      d="M4 1.5h5L13 5.5V14a.5.5 0 0 1-.5.5h-8A.5.5 0 0 1 4 14z"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.2"
-    />
+    <path d="M4 1.5h5L13 5.5V14a.5.5 0 0 1-.5.5h-8A.5.5 0 0 1 4 14z" fill="none" stroke="currentColor" strokeWidth="1.2" />
     <path d="M9 1.7V5.3h3.4" fill="none" stroke="currentColor" strokeWidth="1.2" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+    <path d="M3 4.5h10M6.5 4.5V3.2a.7.7 0 0 1 .7-.7h1.6a.7.7 0 0 1 .7.7v1.3M5 4.5l.5 8a.8.8 0 0 0 .8.7h3.4a.8.8 0 0 0 .8-.7l.5-8" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
   </svg>
 );
 
 interface RowsProps {
   onSelect: (source: string, chunk: ChunkMeta) => void;
+  onDelete: (source: string) => void;
   selectedId: string | null;
 }
 
-function FileRow({ file, depth, onSelect, selectedId }: RowsProps & { file: FileChunks; depth: number }) {
+function FileRow({ file, depth, onSelect, onDelete, selectedId }: RowsProps & { file: FileChunks; depth: number }) {
   const [open, setOpen] = useState(false);
   return (
     <div>
-      <button
-        type="button"
-        className="tree-row tree-row--file"
-        style={{ paddingLeft: depth * 14 + 8 }}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span className="tree-caret">{open ? "▾" : "▸"}</span>
-        <FileIcon />
-        <span className="tree-name">{baseName(file.source)}</span>
-        <span className="tree-badge">{file.chunk_count}</span>
-      </button>
+      <div className="tree-filerow">
+        <button
+          type="button"
+          className="tree-row tree-row--file"
+          style={{ paddingLeft: depth * 14 + 8 }}
+          onClick={() => setOpen((o) => !o)}
+        >
+          <span className="tree-caret">{open ? "▾" : "▸"}</span>
+          <FileIcon />
+          <span className="tree-name">{baseName(file.source)}</span>
+          <span className="tree-badge">{file.chunk_count}</span>
+        </button>
+        <button
+          type="button"
+          className="tree-del"
+          title={`Remove ${baseName(file.source)} from the index`}
+          aria-label={`Remove ${baseName(file.source)}`}
+          onClick={() => onDelete(file.source)}
+        >
+          <TrashIcon />
+        </button>
+      </div>
       {open &&
         file.chunks.map((chunk, index) => (
           <button
@@ -92,7 +105,7 @@ function FileRow({ file, depth, onSelect, selectedId }: RowsProps & { file: File
   );
 }
 
-function FolderRow({ node, depth, onSelect, selectedId }: RowsProps & { node: FolderNode; depth: number }) {
+function FolderRow({ node, depth, onSelect, onDelete, selectedId }: RowsProps & { node: FolderNode; depth: number }) {
   const [open, setOpen] = useState(depth < 3);
   return (
     <div>
@@ -106,21 +119,23 @@ function FolderRow({ node, depth, onSelect, selectedId }: RowsProps & { node: Fo
         <FolderIcon />
         <span className="tree-name">{node.name}</span>
       </button>
-      {open && <TreeLevel node={node} depth={depth + 1} onSelect={onSelect} selectedId={selectedId} />}
+      {open && (
+        <TreeLevel node={node} depth={depth + 1} onSelect={onSelect} onDelete={onDelete} selectedId={selectedId} />
+      )}
     </div>
   );
 }
 
-function TreeLevel({ node, depth, onSelect, selectedId }: RowsProps & { node: FolderNode; depth: number }) {
+function TreeLevel({ node, depth, onSelect, onDelete, selectedId }: RowsProps & { node: FolderNode; depth: number }) {
   const folders = [...node.folders.values()].sort((a, b) => a.name.localeCompare(b.name));
   const files = [...node.files].sort((a, b) => baseName(a.source).localeCompare(baseName(b.source)));
   return (
     <>
       {folders.map((child) => (
-        <FolderRow key={child.name} node={child} depth={depth} onSelect={onSelect} selectedId={selectedId} />
+        <FolderRow key={child.name} node={child} depth={depth} onSelect={onSelect} onDelete={onDelete} selectedId={selectedId} />
       ))}
       {files.map((file) => (
-        <FileRow key={file.source} file={file} depth={depth} onSelect={onSelect} selectedId={selectedId} />
+        <FileRow key={file.source} file={file} depth={depth} onSelect={onSelect} onDelete={onDelete} selectedId={selectedId} />
       ))}
     </>
   );
@@ -129,16 +144,18 @@ function TreeLevel({ node, depth, onSelect, selectedId }: RowsProps & { node: Fo
 export function DocumentTree({
   files,
   onSelect,
+  onDelete,
   selectedId,
 }: {
   files: FileChunks[];
   onSelect: (source: string, chunk: ChunkMeta) => void;
+  onDelete: (source: string) => void;
   selectedId: string | null;
 }) {
   const root = buildTree(files);
   return (
     <div className="tree">
-      <TreeLevel node={root} depth={0} onSelect={onSelect} selectedId={selectedId} />
+      <TreeLevel node={root} depth={0} onSelect={onSelect} onDelete={onDelete} selectedId={selectedId} />
     </div>
   );
 }

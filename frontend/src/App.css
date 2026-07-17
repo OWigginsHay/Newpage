@@ -42,6 +42,21 @@
   border-bottom: var(--border-width) solid var(--border-subtle);
 }
 
+.ingest-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  padding-top: 12px;
+}
+.ingest-opt input {
+  accent-color: var(--brand-teal);
+  cursor: pointer;
+}
+
 /* ---- Banner ---- */
 .banner {
   padding: var(--space-3) var(--space-6);
@@ -502,6 +517,33 @@
   padding: 0 8px;
   flex-shrink: 0;
 }
+/* file row = toggle button + delete button */
+.tree-filerow {
+  display: flex;
+  align-items: center;
+}
+.tree-filerow .tree-row--file {
+  flex: 1;
+  min-width: 0;
+}
+.tree-del {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 10px;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+.tree-filerow:hover .tree-del,
+.tree-del:focus-visible {
+  opacity: 1;
+}
+.tree-del:hover {
+  color: var(--color-danger);
+}
+
 .tree-row--chunk {
   gap: var(--space-3);
   color: var(--text-secondary);
