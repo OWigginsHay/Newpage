@@ -216,9 +216,13 @@ cd backend
 python -m venv .venv
 .venv\Scripts\activate            # Windows
 # source .venv/bin/activate         # macOS / Linux
-pip install -r requirements.txt
-uvicorn app.main:app --reload       # http://localhost:8000  (docs at /docs)
+pip install -r requirements.txt     # versions are pinned for a reproducible install
+python -m uvicorn app.main:app --reload    # http://localhost:8000  (docs at /docs)
 ```
+> Use a fresh venv on a standard Python **3.11–3.13** (verified on 3.13). Running
+> `python -m uvicorn` (rather than bare `uvicorn`) uses the venv's interpreter
+> explicitly — robust if other Pythons are on your PATH (e.g. a conda base env).
+>
 > First ingest downloads the embedding model (~90 MB) and, if OCR runs, the
 > EasyOCR models. You don't need a `.env` — the API key can be entered in the UI
 > (it's then saved to a gitignored `backend/.env` so it survives restarts).

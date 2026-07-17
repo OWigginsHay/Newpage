@@ -41,7 +41,7 @@ cp .env.example .env      # then add your OPENAI_API_KEY
 ## Run
 
 ```bash
-uvicorn app.main:app --reload           # http://localhost:8000  (docs at /docs)
+python -m uvicorn app.main:app --reload  # http://localhost:8000  (docs at /docs)
 ```
 
 Ingest some documents, then chat:
