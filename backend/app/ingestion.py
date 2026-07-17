@@ -13,10 +13,17 @@ from . import embeddings, vector_store
 from .chunking import chunk_text
 from .config import settings
 
-TEXT_EXTENSIONS = {".txt", ".md", ".markdown", ".rst", ".csv", ".json", ".log"}
+TEXT_EXTENSIONS = {".txt", ".md", ".markdown", ".rst", ".csv", ".tsv", ".json", ".log"}
+CODE_EXTENSIONS = {
+    ".py", ".js", ".jsx", ".ts", ".tsx", ".java", ".c", ".h", ".cpp", ".hpp",
+    ".cs", ".go", ".rs", ".rb", ".php", ".sh", ".sql", ".yaml", ".yml",
+    ".toml", ".ini", ".xml", ".css",
+}
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff", ".gif"}
 HTML_EXTENSIONS = {".html", ".htm"}
-SUPPORTED_EXTENSIONS = TEXT_EXTENSIONS | IMAGE_EXTENSIONS | HTML_EXTENSIONS | {".pdf"}
+SUPPORTED_EXTENSIONS = (
+    TEXT_EXTENSIONS | CODE_EXTENSIONS | IMAGE_EXTENSIONS | HTML_EXTENSIONS | {".pdf"}
+)
 
 _IMAGE_PREFIX = "[image] "  # marks chunks whose text came from OCR of an image
 
@@ -39,7 +46,7 @@ def get_pages(path: str) -> list[tuple[int | None, str]]:
         from .ocr import ocr_image  # the image's content is text we OCR
 
         return [(None, _IMAGE_PREFIX + ocr_image(path))]
-    if ext in TEXT_EXTENSIONS:
+    if ext in TEXT_EXTENSIONS or ext in CODE_EXTENSIONS:
         with open(path, "r", encoding="utf-8", errors="replace") as handle:
             return [(None, handle.read())]
     raise ValueError(f"Unsupported file type: {ext or '(none)'}")
